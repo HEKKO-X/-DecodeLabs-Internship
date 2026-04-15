@@ -5,9 +5,7 @@
 
 ## 📌 Overview
 
-This project builds a **Password Strength Checker** — a Python program that evaluates any password and classifies it as **WEAK**, **MEDIUM**, or **STRONG** using a 5-point scoring system.
-
-Project 1 is the defensive foundation of the training program. Before protecting networks or encrypting data, a security analyst must master the fundamentals of **data validation and entropy** — understanding what makes a password genuinely safe, not just superficially complex.
+In This project, I built a **Password Strength Checker** — a Python program that evaluates any password and classifies it as **WEAK**, **MEDIUM**, or **STRONG** using a 5-point scoring system.
 
 > *"Before you protect massive networks, you must master the fundamental principles of data validation and entropy."* — DecodeLabs Project 1 Brief
 
