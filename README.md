@@ -328,31 +328,6 @@ Week 3 — Threat Detection
 
 ---
 
-## 🔁 Repository Structure
-
-```
-decodelabs-cybersecurity-batch2026/
-│
-├── README.md                          ← You are here (master overview)
-│
-├── project-1-password-checker/
-│   ├── password_checker.py
-│   ├── demo.jsx
-│   └── README.md
-│
-├── project-2-caesar-cipher/
-│   ├── cipher.py
-│   ├── cipher_interactive.html
-│   └── README.md
-│
-└── project-3-phishing-analyzer/
-    ├── phishing_analyzer.py
-    ├── phishing_analyzer.html
-    └── README.md
-```
-
----
-
 ## ▶️ How to Run Any Project
 
 All projects require **Python 3.x only** — no external libraries or package installs needed.
