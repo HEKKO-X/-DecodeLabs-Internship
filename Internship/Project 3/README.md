@@ -5,7 +5,7 @@
 
 ## 📌 Overview
 
-This project builds a **Phishing Triage Toolkit** — a Python-based engine and interactive browser tool that analyzes emails and messages for phishing indicators, classifies the threat level, and delivers a clear, actionable verdict.
+In this project, I built a **Phishing Triage Toolkit** — a Python-based engine and interactive browser tool that analyzes emails and messages for phishing indicators, classifies the threat level, and delivers a clear, actionable verdict.
 
 Project 3 moves from technical cryptography into **human-layer security** — the most exploited attack surface in cybersecurity. As the training brief states: *"The modern cybersecurity perimeter is no longer the network firewall. It is the user."*
 
