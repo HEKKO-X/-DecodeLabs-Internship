@@ -216,21 +216,6 @@ The program will prompt you to enter a password, display the full strength repor
 
 ---
 
-## 🔗 What Comes Next
-
-Project 1 is the **gatekeeper** for the entire program. Its lesson — validate before you trust — carries directly into Project 2.
-
-> *"You cannot hash what is weak. Filter entropy before Argon2id."* — DecodeLabs Project 1 Brief
-
-```
-Project 1            →   Project 2              →   Project 3
-Password Validation      Caesar Cipher               Phishing Detection
-(Is it strong enough      (How do we protect it       (How do attackers
- to be worth securing?)    once it's validated?)        try to steal it?)
-```
-
----
-
 ## 📚 Key Concepts Learned
 
 - Password entropy and brute force risk
@@ -252,5 +237,5 @@ Password Validation      Caesar Cipher               Phishing Detection
 
 ---
 
-> *"By completing this milestone, you are proving you can build a program that evaluates risk through pure string-handling and conditional logic."*
+> *"By completing this milestone, I am confident I can build a program that evaluates risk through pure string-handling and conditional logic."*
 > — DecodeLabs Project 1 Brief
