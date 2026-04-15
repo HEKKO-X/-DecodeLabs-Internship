@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Caesar Cipher — DecodeLabs Project 2</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0A2540; font-family: monospace; color: #fff; min-height: 100vh; padding: 1.5rem; }
+    h1 { font-size: 1.3rem; color: #fff; margin-bottom: 0.2rem; }
+    .subtitle { font-size: 0.75rem; color: #AFA9EC; margin-bottom: 1.5rem; }
+    .header { text-align: center; margin-bottom: 1.5rem; }
+    .icon { font-size: 2rem; margin-bottom: 0.3rem; }
+
+    .tabs { display: flex; justify-content: center; gap: 8px; background: #060F1E; border-radius: 999px; padding: 4px; width: fit-content; margin: 0 auto 1.5rem; }
+    .tab { padding: 8px 24px; border-radius: 999px; border: none; cursor: pointer; font-family: monospace; font-size: 13px; font-weight: 500; background: transparent; color: #AFA9EC; transition: all 0.2s; }
+    .tab.active { background: #534AB7; color: #fff; }
+
+    .card { background: #0F1F3D; border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1rem; max-width: 720px; margin-left: auto; margin-right: auto; }
+    .card.green-border { border-left: 4px solid #1D9E75; }
+    .card-label { font-size: 11px; color: #AFA9EC; letter-spacing: 2px; display: block; margin-bottom: 8px; }
+    .card-label.green { color: #9FE1CB; }
+    .card-label.red { color: #F0997B; }
+
+    textarea { width: 100%; background: #060F1E; border: 1px solid #1D2A4A; border-radius: 8px; color: #fff; font-family: monospace; font-size: 14px; padding: 0.7rem; resize: vertical; outline: none; }
+    textarea:focus { border-color: #534AB7; }
+
+    .slider-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .shift-value { font-size: 20px; font-weight: 700; color: #534AB7; }
+    input[type=range] { width: 100%; accent-color: #534AB7; }
+    .slider-ends { display: flex; justify-content: space-between; font-size: 10px; color: #3A5070; margin-top: 4px; }
+
+    .output-box { background: #060F1E; border-radius: 8px; padding: 0.8rem 1rem; min-height: 52px; font-size: 14px; word-break: break-all; letter-spacing: 1px; color: #3A5070; }
+    .output-box.has-value { color: #1D9E75; }
+
+    .copy-btn { margin-top: 8px; background: none; border: 1px solid #1D9E75; border-radius: 6px; color: #9FE1CB; font-size: 11px; padding: 4px 12px; cursor: pointer; font-family: monospace; display: none; }
+
+    .alpha-grid { overflow-x: auto; }
+    .alpha-row { display: flex; gap: 4px; margin-bottom: 4px; }
+    .alpha-cell { min-width: 22px; text-align: center; font-size: 11px; padding: 3px 0; color: #5B7EA6; }
+    .alpha-cell.shifted { color: #534AB7; font-weight: 600; background: #1A1440; border-radius: 4px; }
+    .alpha-note { font-size: 10px; color: #3A5070; margin-top: 8px; }
+
+    .brute-row { display: flex; gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid #1D2A4A; }
+    .brute-key { min-width: 50px; font-size: 11px; color: #D85A30; }
+    .brute-result { font-size: 13px; color: #fff; word-break: break-all; }
+    .brute-note { font-size: 10px; color: #3A5070; margin-top: 10px; }
+
+    .footer { text-align: center; font-size: 10px; color: #1D2A4A; margin-top: 1rem; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="icon">🔐</div>
+    <h1>Caesar Cipher Tool</h1>
+    <p class="subtitle">DecodeLabs · Cyber Security · Project 2</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('encrypt')">Encrypt</button>
+    <button class="tab"        onclick="switchTab('decrypt')">Decrypt</button>
+    <button class="tab"        onclick="switchTab('brute')">Brute Force</button>
+  </div>
+
+  <div class="card">
+    <label class="card-label" id="inputLabel">PLAINTEXT</label>
+    <textarea id="inputText" rows="3" placeholder="Type your message here..." oninput="update()"></textarea>
+  </div>
+
+  <div class="card" id="sliderCard">
+    <div class="slider-row">
+      <label class="card-label" style="margin:0">SHIFT KEY</label>
+      <span class="shift-value" id="shiftDisplay">3</span>
+    </div>
+    <input type="range" id="shiftSlider" min="1" max="25" value="3" oninput="update()"/>
+    <div class="slider-ends"><span>1</span><span>25</span></div>
+  </div>
+
+  <div class="card green-border" id="outputCard">
+    <label class="card-label green" id="outputLabel">ENCRYPTED OUTPUT</label>
+    <div class="output-box" id="outputBox">Output will appear here...</div>
+    <button class="copy-btn" id="copyBtn" onclick="copyOutput()">Copy</button>
+  </div>
+
+  <div class="card" id="alphaCard">
+    <label class="card-label">ALPHABET SHIFT PREVIEW</label>
+    <div class="alpha-grid">
+      <div class="alpha-row" id="alphaTop"></div>
+      <div class="alpha-row" id="alphaBottom"></div>
+    </div>
+    <p class="alpha-note">Top row = original &nbsp;·&nbsp; Bottom row = shifted</p>
+  </div>
+
+  <div class="card hidden" id="bruteCard">
+    <label class="card-label red">ALL 25 POSSIBLE DECRYPTIONS</label>
+    <div id="bruteRows"><p style="color:#3A5070;font-size:13px">Enter ciphertext above to see all possibilities.</p></div>
+  </div>
+
+  <p class="footer">DecodeLabs · Batch 2026 · #Cryptography</p>
+
+  <script>
+    var currentTab = 'encrypt';
+    var ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+    function caesarShift(text, shift) {
+      return text.split('').map(function(char) {
+        if (/[a-zA-Z]/.test(char)) {
+          var base = (char >= 'a') ? 97 : 65;
+          return String.fromCharCode(((char.charCodeAt(0) - base + ((shift % 26) + 26)) % 26) + base);
+        }
+        return char;
+      }).join('');
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      var tabs = document.querySelectorAll('.tab');
+      var names = ['encrypt', 'decrypt', 'brute'];
+      tabs.forEach(function(btn, i) {
+        btn.classList.toggle('active', names[i] === tab);
+      });
+
+      var isBrute = (tab === 'brute');
+      document.getElementById('sliderCard').classList.toggle('hidden', isBrute);
+      document.getElementById('outputCard').classList.toggle('hidden', isBrute);
+      document.getElementById('alphaCard').classList.toggle('hidden', isBrute);
+      document.getElementById('bruteCard').classList.toggle('hidden', !isBrute);
+
+      document.getElementById('inputLabel').textContent =
+        tab === 'encrypt' ? 'PLAINTEXT' :
+        tab === 'decrypt' ? 'CIPHERTEXT' : 'ENTER CIPHERTEXT';
+
+      document.getElementById('inputText').placeholder =
+        tab === 'encrypt' ? 'Type your message here...' : 'Paste ciphertext here...';
+
+      update();
+    }
+
+    function update() {
+      var text  = document.getElementById('inputText').value;
+      var shift = parseInt(document.getElementById('shiftSlider').value);
+      document.getElementById('shiftDisplay').textContent = shift;
+
+      if (currentTab === 'brute') { renderBrute(text); return; }
+
+      var result = currentTab === 'encrypt' ? caesarShift(text, shift) : caesarShift(text, -shift);
+      var outBox  = document.getElementById('outputBox');
+      var copyBtn = document.getElementById('copyBtn');
+
+      document.getElementById('outputLabel').textContent =
+        currentTab === 'encrypt' ? 'ENCRYPTED OUTPUT' : 'DECRYPTED OUTPUT';
+
+      if (text) {
+        outBox.textContent = result;
+        outBox.className = 'output-box has-value';
+        copyBtn.style.display = 'inline-block';
+      } else {
+        outBox.textContent = 'Output will appear here...';
+        outBox.className = 'output-box';
+        copyBtn.style.display = 'none';
+      }
+
+      var topRow    = document.getElementById('alphaTop');
+      var bottomRow = document.getElementById('alphaBottom');
+      topRow.innerHTML = '';
+      bottomRow.innerHTML = '';
+      var effectiveShift = currentTab === 'encrypt' ? shift : -shift;
+
+      ALPHA.split('').forEach(function(letter) {
+        var top = document.createElement('div');
+        top.className = 'alpha-cell';
+        top.textContent = letter;
+        topRow.appendChild(top);
+
+        var bot = document.createElement('div');
+        bot.className = 'alpha-cell shifted';
+        bot.textContent = caesarShift(letter, effectiveShift);
+        bottomRow.appendChild(bot);
+      });
+    }
+
+    function renderBrute(text) {
+      var container = document.getElementById('bruteRows');
+      if (!text) {
+        container.innerHTML = '<p style="color:#3A5070;font-size:13px">Enter ciphertext above to see all possibilities.</p>';
+        return;
+      }
+      var html = '';
+      for (var key = 1; key <= 25; key++) {
+        html += '<div class="brute-row"><span class="brute-key">Key ' + key + '</span><span class="brute-result">' + caesarShift(text, -key) + '</span></div>';
+      }
+      html += '<p class="brute-note">Only 25 possible keys — this is why Caesar Cipher is not secure for real use.</p>';
+      container.innerHTML = html;
+    }
+
+    function copyOutput() {
+      var text = document.getElementById('outputBox').textContent;
+      navigator.clipboard.writeText(text).then(function() {
+        var btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+      });
+    }
+
+    update();
+  </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Phishing Analyzer — DecodeLabs Project 3</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#f5f0e8;font-family:system-ui,sans-serif;color:#1a1a1a;min-height:100vh;padding:1.5rem;}
+    h1{font-size:1.3rem;font-weight:700;color:#1a1a1a;margin-bottom:0.2rem;}
+    .subtitle{font-size:0.75rem;color:#666;margin-bottom:1.5rem;}
+    .header{text-align:center;margin-bottom:1.5rem;}
+    .icon{font-size:2rem;margin-bottom:0.3rem;}
+
+    .card{background:#fff;border-radius:12px;padding:1.2rem;margin-bottom:1rem;max-width:760px;margin-left:auto;margin-right:auto;border:1px solid #e0d8cc;}
+    .card-label{font-size:11px;color:#666;letter-spacing:2px;font-weight:600;display:block;margin-bottom:8px;text-transform:uppercase;}
+
+    textarea{width:100%;background:#fafaf8;border:1.5px solid #ddd;border-radius:8px;color:#1a1a1a;font-family:monospace;font-size:13px;padding:0.8rem;resize:vertical;outline:none;min-height:140px;}
+    textarea:focus{border-color:#c0392b;}
+
+    .samples{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;max-width:760px;margin-left:auto;margin-right:auto;}
+    .sample-btn{padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;font-size:12px;cursor:pointer;font-family:monospace;transition:all 0.2s;}
+    .sample-btn:hover{background:#f0ebe3;}
+    .sample-btn.malicious{border-color:#c0392b;color:#c0392b;}
+    .sample-btn.suspicious{border-color:#e67e22;color:#e67e22;}
+    .sample-btn.safe{border-color:#27ae60;color:#27ae60;}
+
+    .analyze-btn{display:block;width:100%;max-width:760px;margin:0 auto 1rem;padding:12px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:monospace;transition:background 0.2s;}
+    .analyze-btn:hover{background:#333;}
+
+    /* Verdict banner */
+    .verdict-banner{border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;max-width:760px;margin-left:auto;margin-right:auto;display:none;}
+    .verdict-banner.malicious{background:#fdf0ee;border:2px solid #c0392b;}
+    .verdict-banner.suspicious{background:#fef9ed;border:2px solid #e67e22;}
+    .verdict-banner.safe{background:#edfbf3;border:2px solid #27ae60;}
+
+    .verdict-title{font-size:18px;font-weight:700;margin-bottom:6px;}
+    .verdict-title.malicious{color:#c0392b;}
+    .verdict-title.suspicious{color:#e67e22;}
+    .verdict-title.safe{color:#27ae60;}
+
+    .verdict-action{font-size:13px;color:#444;font-weight:500;}
+    .verdict-score{font-size:11px;color:#999;margin-top:4px;}
+
+    /* Red flags list */
+    .flags-section{max-width:760px;margin:0 auto 1rem;}
+    .flags-title{font-size:12px;letter-spacing:2px;color:#666;font-weight:600;margin-bottom:10px;}
+    .flag-card{background:#fff;border-radius:8px;padding:0.9rem 1rem;margin-bottom:8px;border:1px solid #e0d8cc;border-left:4px solid #ccc;}
+    .flag-card.high{border-left-color:#c0392b;}
+    .flag-card.medium{border-left-color:#e67e22;}
+    .flag-card.low{border-left-color:#f1c40f;}
+    .flag-name{font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:3px;}
+    .flag-meta{font-size:11px;color:#999;margin-bottom:5px;}
+    .flag-match{font-size:11px;font-family:monospace;background:#f5f0e8;padding:2px 6px;border-radius:4px;color:#c0392b;display:inline-block;margin-bottom:5px;}
+    .flag-why{font-size:12px;color:#555;line-height:1.5;}
+    .sev-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px;}
+    .sev-badge.high{background:#fdf0ee;color:#c0392b;}
+    .sev-badge.medium{background:#fef9ed;color:#e67e22;}
+    .sev-badge.low{background:#fefde8;color:#c9a800;}
+
+    /* Triage guide */
+    .triage-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;max-width:760px;margin:0 auto 1rem;}
+    .triage-card{border-radius:8px;padding:0.9rem;border:1px solid #e0d8cc;background:#fff;}
+    .triage-card h3{font-size:13px;font-weight:700;margin-bottom:6px;}
+    .triage-card p{font-size:12px;color:#555;line-height:1.5;}
+    .triage-card.safe-c{border-left:4px solid #27ae60;}
+    .triage-card.sus-c{border-left:4px solid #e67e22;}
+    .triage-card.mal-c{border-left:4px solid #c0392b;}
+
+    .golden-rule{max-width:760px;margin:0 auto 1rem;background:#1a1a1a;color:#fff;border-radius:10px;padding:1rem 1.2rem;text-align:center;}
+    .golden-rule h3{font-size:13px;letter-spacing:2px;margin-bottom:8px;color:#aaa;}
+    .golden-steps{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;}
+    .step{font-size:14px;font-weight:700;}
+    .step span{font-size:11px;font-weight:400;color:#aaa;display:block;text-align:center;}
+
+    .footer{text-align:center;font-size:10px;color:#bbb;margin-top:1rem;}
+    .hidden{display:none!important;}
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="icon">🎣</div>
+    <h1>Phishing Awareness Analyzer</h1>
+    <p class="subtitle">DecodeLabs · Cyber Security · Project 3 — Triage Toolkit</p>
+  </div>
+
+  <!-- Sample buttons -->
+  <div class="samples">
+    <span style="font-size:12px;color:#666;align-self:center;margin-right:4px;">Load sample:</span>
+    <button class="sample-btn malicious" onclick="loadSample('malicious')">🔴 BEC — CEO Fraud</button>
+    <button class="sample-btn suspicious" onclick="loadSample('suspicious')">🟡 Fake Microsoft Alert</button>
+    <button class="sample-btn safe" onclick="loadSample('safe')">🟢 Normal Internal Email</button>
+  </div>
+
+  <!-- Input -->
+  <div class="card">
+    <label class="card-label">Paste email or message to analyze</label>
+    <textarea id="emailInput" placeholder="Paste the full email text here — including From:, Subject:, and body..."></textarea>
+  </div>
+
+  <button class="analyze-btn" onclick="analyze()">🔍 Run Triage Analysis</button>
+
+  <!-- Verdict -->
+  <div class="verdict-banner" id="verdictBanner">
+    <div class="verdict-title" id="verdictTitle"></div>
+    <div class="verdict-action" id="verdictAction"></div>
+    <div class="verdict-score" id="verdictScore"></div>
+  </div>
+
+  <!-- Red flags -->
+  <div class="flags-section hidden" id="flagsSection">
+    <div class="flags-title" id="flagsTitle"></div>
+    <div id="flagsList"></div>
+  </div>
+
+  <!-- Triage guide -->
+  <div class="card" style="max-width:760px;margin-left:auto;margin-right:auto;">
+    <label class="card-label">Triage Decision Model</label>
+    <div class="triage-grid" style="margin:0;max-width:100%;">
+      <div class="triage-card safe-c">
+        <h3 style="color:#27ae60;">🟢 Safe → Close</h3>
+        <p>0–2 low-severity flags. No critical indicators. No action needed beyond routine archiving.</p>
+      </div>
+      <div class="triage-card sus-c">
+        <h3 style="color:#e67e22;">🟡 Suspicious → Warn User</h3>
+        <p>1 high or 3–4 medium flags. Do not click links. Verify the sender via phone on a known number.</p>
+      </div>
+      <div class="triage-card mal-c">
+        <h3 style="color:#c0392b;">🔴 Malicious → Block & Escalate</h3>
+        <p>2+ high flags or score ≥ 6. Block sender domain immediately. Escalate to the security team.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Golden Rule -->
+  <div class="golden-rule">
+    <h3>THE GOLDEN RULE OF THE HUMAN FIREWALL</h3>
+    <div class="golden-steps">
+      <div class="step">1. PAUSE <span>Recognize the trigger</span></div>
+      <div class="step" style="color:#aaa;">→</div>
+      <div class="step">2. VERIFY <span>Out-of-band check</span></div>
+      <div class="step" style="color:#aaa;">→</div>
+      <div class="step">3. REPORT <span>Don't just delete</span></div>
+    </div>
+  </div>
+
+  <p class="footer">DecodeLabs · Batch 2026 · #CyberSecurity #PhishingAwareness</p>
+
+  <script>
+    var SAMPLES = {
+      malicious: 'From: CEO Name <ceo.urgent@executive-update.com>\nSubject: IMMEDIATE ACTION REQUIRED: Transfer Authorization\n\nURGENT: Process the attached wire transfer instruction immediately.\n\nThis is critical and must remain STRICTLY CONFIDENTIAL.\nDo not discuss with anyone. Bypass standard procedure.\n\nI lost my wallet at the airport. Need you to wire transfer funds for my flight immediately.\nThis expires in 24 hours.\n\nThank you.',
+      suspicious: 'From: Microsoft Support <support@logins-updates.com>\nSubject: FW: Urgent: Your Account Security Alert\n\nYour Microsoft account has been suspended.\nPlease verify your account immediately to avoid permanent loss.\n\nClick here to confirm your password:\nhttp://microsoft-secure-login.verify-account.xyz/update\n\nThis link expires in 24 hours.',
+      safe: 'From: Project Manager <sarah.lee@company.com>\nSubject: Q3 Project Status Update - Non-Urgent\n\nHi Team,\n\nPlease review the attached project status for Q3 at your earliest convenience.\nNo immediate action is required.\n\nThanks,\nSarah\n\nAttachment: Q3_Status.pdf'
+    };
+
+    var FLAGS = [
+      // Keywords
+      {p:/\burgent\b/i,            name:"Urgency keyword",              cat:"Content / Keyword",  sev:2, why:"Creates artificial time pressure to bypass rational thinking."},
+      {p:/\bimmediately\b/i,       name:"Urgency keyword",              cat:"Content / Keyword",  sev:2, why:"Forces a fight-or-flight response — a classic cognitive exploit."},
+      {p:/\bact now\b/i,           name:"Urgency keyword",              cat:"Content / Keyword",  sev:2, why:"Pressures victim to skip verification steps."},
+      {p:/\bexpires?\b/i,          name:"Deadline pressure",            cat:"Content / Keyword",  sev:2, why:"Fake deadlines are used to create urgency and panic."},
+      {p:/\b24 hours?\b/i,         name:"Deadline pressure",            cat:"Content / Keyword",  sev:2, why:"Specific time windows increase perceived urgency."},
+      {p:/\blimited time\b/i,      name:"Deadline pressure",            cat:"Content / Keyword",  sev:2, why:"Scarcity tactic to force impulsive action."},
+      {p:/\bverify your account\b/i, name:"Account verification request",cat:"Content / Keyword", sev:3, why:"Phishing emails often fake account alerts to harvest credentials."},
+      {p:/\bconfirm your (password|details|information|identity)\b/i, name:"Credential request", cat:"Content / Keyword", sev:3, why:"Legitimate services never ask for passwords via email."},
+      {p:/\bupdate your (billing|payment|card|info)\b/i, name:"Payment detail request", cat:"Content / Keyword", sev:3, why:"A common Business Email Compromise (BEC) tactic."},
+      {p:/\byour account (has been|will be) (suspended|locked|disabled|terminated)\b/i, name:"Account suspension threat", cat:"Content / Keyword", sev:3, why:"Fear-based trigger to force immediate action without verification."},
+      {p:/\bwire transfer\b/i,     name:"Wire transfer request",        cat:"Content / Keyword",  sev:3, why:"Classic Business Email Compromise (BEC) — CEO fraud scenario."},
+      {p:/\bstrictly confidential\b/i, name:"Secrecy demand",          cat:"Content / Keyword",  sev:3, why:"Red Flag 5: Demands secrecy to prevent the victim from consulting others."},
+      {p:/\bdo not (discuss|tell|share)\b/i, name:"Secrecy demand",     cat:"Content / Keyword",  sev:3, why:"Isolating the victim from peers is a core social engineering tactic."},
+      {p:/\bbypass (standard|normal|security) (procedure|protocol|process)\b/i, name:"Procedure bypass request", cat:"Content / Keyword", sev:3, why:"Requesting victims skip security protocols is a critical red flag."},
+      {p:/\bcongratulations\b/i,   name:"Prize / reward lure",         cat:"Content / Keyword",  sev:2, why:"Unexpected rewards exploit greed — a classic phishing hook."},
+      {p:/\byou (have won|are selected|are a winner)\b/i, name:"Prize lure", cat:"Content / Keyword", sev:2, why:"Fabricated winnings are used to lower the victim's guard."},
+      {p:/\bfree (gift|reward|prize|iphone|laptop)\b/i, name:"Free item lure", cat:"Content / Keyword", sev:2, why:"Greed-based lure designed to override rational decision-making."},
+      {p:/\blegal action\b/i,      name:"Threat of legal action",       cat:"Content / Keyword",  sev:3, why:"Fear/Greed trigger — threatening consequences to force compliance."},
+      {p:/\b(IRS|EFCC|police|FBI)\b/i, name:"Authority impersonation", cat:"Content / Keyword",  sev:3, why:"Impersonating law enforcement to create extreme fear."},
+      {p:/\b(enter|provide|submit|send) your (password|pin|ssn|otp|code|credentials)\b/i, name:"Credential harvesting", cat:"Content / Keyword", sev:3, why:"No legitimate service requests credentials via email."},
+      {p:/\b(mfa|one.time (password|code|pin))\b/i, name:"MFA code request", cat:"Content / Keyword", sev:3, why:"Red Flag 6: Attackers request MFA codes to bypass 2FA in real-time."},
+      // URLs
+      {p:/https?:\/\/\d+\.\d+\.\d+\.\d+/i, name:"IP address URL",      cat:"URL / Domain",       sev:3, why:"Legitimate services use domain names, not raw IP addresses."},
+      {p:/https?:\/\/[^\s]*(login|secure|verify|update|account)[^\s]*\.[a-z]{2,}/i, name:"Suspicious login domain", cat:"URL / Domain", sev:3, why:"Domains containing security keywords are often spoofed."},
+      {p:/https?:\/\/[^\s]*-[^\s]*\.(com|net|org)/i, name:"Hyphenated domain", cat:"URL / Domain", sev:2, why:"Combosquatting: adding words like 'secure-login' to brand names."},
+      {p:/https?:\/\/[^\s]*\.(xyz|tk|ml|ga|cf|gq)/i, name:"Suspicious TLD",    cat:"URL / Domain", sev:3, why:"Free or uncommon TLDs (.xyz, .tk) are heavily abused by attackers."},
+      {p:/bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly/i,   name:"Shortened URL",      cat:"URL / Domain", sev:2, why:"URL shorteners hide the true destination — always expand before clicking."},
+      {p:/https?:\/\/[^\s]*@[^\s]*/i,               name:"URL with @ symbol",   cat:"URL / Domain", sev:3, why:"Anything before @ in a URL is ignored — a common obfuscation trick."},
+      // Sender
+      {p:/from:.*<[^>]*gmail\.com>/i,   name:"Free email domain sender", cat:"Sender / Header", sev:2, why:"Legitimate companies use corporate domains, not gmail.com."},
+      {p:/from:.*<[^>]*yahoo\.com>/i,   name:"Free email domain sender", cat:"Sender / Header", sev:2, why:"Legitimate companies use corporate domains, not yahoo.com."},
+      // Attachments
+      {p:/\.(exe|js|vbs|scr|bat|cmd|ps1|iso|lnk)\b/i, name:"Dangerous attachment extension", cat:"Attachment", sev:3, why:"Red Flag 4: These file types can execute malicious code."},
+      {p:/\.(zip|rar|7z)\b/i,           name:"Compressed archive",       cat:"Attachment",       sev:2, why:"Archives are used to bypass email filters scanning for malicious files."},
+    ];
+
+    function loadSample(type) {
+      document.getElementById('emailInput').value = SAMPLES[type];
+    }
+
+    function analyze() {
+      var text = document.getElementById('emailInput').value.trim();
+      if (!text) { alert('Please paste an email or message to analyze.'); return; }
+
+      var findings = [];
+      var seen = new Set();
+      FLAGS.forEach(function(f) {
+        var m = text.match(f.p);
+        if (m && !seen.has(f.name + f.sev)) {
+          seen.add(f.name + f.sev);
+          findings.push({ name:f.name, cat:f.cat, sev:f.sev, why:f.why, match:m[0] });
+        }
+      });
+
+      // Triage
+      var high   = findings.filter(function(f){return f.sev===3;}).length;
+      var medium = findings.filter(function(f){return f.sev===2;}).length;
+      var score  = (high*3)+(medium*2);
+      var verdict, action, cls;
+      if (high>=2 || score>=6) {
+        verdict="🔴 MALICIOUS"; action="BLOCK domain & ESCALATE to security team immediately."; cls="malicious";
+      } else if (high===1 || score>=3) {
+        verdict="🟡 SUSPICIOUS"; action="WARN user. Do not click links. Verify sender via phone on a known number."; cls="suspicious";
+      } else {
+        verdict="🟢 SAFE"; action="CLOSE. No significant threat indicators found."; cls="safe";
+      }
+
+      // Render verdict
+      var banner = document.getElementById('verdictBanner');
+      banner.className = 'verdict-banner '+cls;
+      banner.style.display = 'block';
+      var vt = document.getElementById('verdictTitle');
+      vt.textContent = verdict;
+      vt.className = 'verdict-title '+cls;
+      document.getElementById('verdictAction').textContent = '→ Action: ' + action;
+      document.getElementById('verdictScore').textContent = 'Risk score: '+score+' | High severity flags: '+high+' | Medium: '+medium;
+
+      // Render flags
+      var sec = document.getElementById('flagsSection');
+      var list = document.getElementById('flagsList');
+      if (findings.length === 0) {
+        sec.classList.add('hidden');
+      } else {
+        sec.classList.remove('hidden');
+        document.getElementById('flagsTitle').textContent = findings.length + ' RED FLAG' + (findings.length>1?'S':'')+' DETECTED';
+        list.innerHTML = '';
+        findings.sort(function(a,b){return b.sev-a.sev;}).forEach(function(f,i){
+          var sevLabel = f.sev===3?'HIGH':f.sev===2?'MEDIUM':'LOW';
+          var sevCls   = f.sev===3?'high':f.sev===2?'medium':'low';
+          list.innerHTML += '<div class="flag-card '+sevCls+'">'
+            +'<div class="flag-name">'+(i+1)+'. '+f.name+'<span class="sev-badge '+sevCls+'">'+sevLabel+'</span></div>'
+            +'<div class="flag-meta">Category: '+f.cat+'</div>'
+            +'<div class="flag-match">Matched: "'+f.match+'"</div>'
+            +'<div class="flag-why">⚠ '+f.why+'</div>'
+            +'</div>';
+        });
+      }
+
+      // Scroll to results
+      banner.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  </script>
+</body>
+</html>
