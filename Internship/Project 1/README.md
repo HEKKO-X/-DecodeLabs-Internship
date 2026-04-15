@@ -156,7 +156,7 @@ This is why enterprise security systems use mutable `bytearray` objects for sens
 ```
 project-1-password-checker/
 ├── password_checker.py       # Main Python CLI tool
-├── demo.jsx                  # Interactive React demo (AI-assisted)
+├── Password_checker.html     # Interactive HTML demo (AI-assisted)
 └── README.md                 # This file
 ```
 
