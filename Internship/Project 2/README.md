@@ -194,11 +194,3 @@ Modern standards like **AES-256** use confusion, diffusion, and 128-bit keys —
 - **Program:** DecodeLabs Cyber Security Industrial Training — Batch 2026
 - **Track:** Junior Analyst / Defensive Logic
 
----
-
-## 📬 Connect
-
-Built by an intern at **DecodeLabs** as part of the Batch 2026 Cyber Security Industrial Training.
-
-> *"Master the logic of the shift, and you master the foundation of the shield."*
-> — DecodeLabs Project 2 Brief
