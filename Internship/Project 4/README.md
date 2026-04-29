@@ -307,6 +307,5 @@ Double-click `vulnerability\\\_checklist.html` — no install needed. Work throu
 
 \---
 
-> \\\*"By finishing this, you prove you can identify critical gaps through pure defensive logic."\\\*
 > — DecodeLabs Project 4 Brief
 
